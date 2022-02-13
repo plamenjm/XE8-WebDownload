@@ -1,0 +1,118 @@
+object MainFrm: TMainFrm
+  Left = 0
+  Top = 0
+  Caption = 'Web Page Source'
+  ClientHeight = 480
+  ClientWidth = 320
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnActivate = FormActivate
+  OnCreate = FormCreate
+  OnClose = FormClose
+  OnDeactivate = FormDeactivate
+  OnDestroy = FormDestroy
+  OnKeyUp = FormKeyUp
+  DesignerMasterStyle = 0
+  object TabControl: TTabControl
+    Align = Client
+    FullSize = True
+    Size.Width = 320.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    TabHeight = 49.000000000000000000
+    TabIndex = 0
+    TabOrder = 0
+    TabPosition = PlatformDefault
+    OnChange = TabControlChange
+    object IntroTabItem: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 107.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'IntroTabItem'
+      inline IntroFrm: TIntroFrm
+        Align = Client
+        Size.Width = 320.000000000000000000
+        Size.Height = 431.000000000000000000
+        Size.PlatformDefault = False
+        inherited Panel1: TPanel
+          Position.Y = 165.000000000000000000
+          Size.Height = 100.000000000000000000
+          inherited GetStartedButton: TButton
+            Margins.Left = 20.000000000000000000
+            Margins.Right = 20.000000000000000000
+            Position.X = 20.000000000000000000
+            Position.Y = 68.000000000000000000
+            Size.Width = 270.000000000000000000
+            Size.Height = 32.000000000000000000
+            OnClick = IntroFrmGetStartedButtonClick
+          end
+        end
+      end
+    end
+    object PageAddressTabItem: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 107.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'PageAddressTabItem'
+      inline PageAddressFrm: TPageAddressFrm
+        Align = Client
+        Size.Width = 320.000000000000000000
+        Size.Height = 431.000000000000000000
+        Size.PlatformDefault = False
+        inherited Panel1: TPanel
+          Position.Y = 165.000000000000000000
+          Size.Height = 100.000000000000000000
+          inherited WebAddressEdit: TEdit
+            Size.Height = 32.000000000000000000
+          end
+          inherited DownloadButton: TButton
+            Margins.Left = 20.000000000000000000
+            Margins.Right = 20.000000000000000000
+            Position.X = 20.000000000000000000
+            Position.Y = 68.000000000000000000
+            Size.Width = 270.000000000000000000
+            Size.Height = 32.000000000000000000
+            OnClick = PageAddressFrmDownloadButtonClick
+          end
+        end
+      end
+    end
+    object PageSourceTabItem: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 104.000000000000000000
+      Size.Height = 49.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'PageSourceTabItem'
+      inline PageSourceFrm: TPageSourceFrm
+        Align = Client
+        Size.Width = 320.000000000000000000
+        Size.Height = 431.000000000000000000
+        Size.PlatformDefault = False
+        inherited Panel1: TPanel
+          Align = Contents
+          Size.Height = 421.000000000000000000
+          inherited ResponseMemo: TMemo
+            Size.Height = 405.000000000000000000
+            Viewport.Width = 306.000000000000000000
+            Viewport.Height = 401.000000000000000000
+          end
+        end
+      end
+    end
+  end
+end

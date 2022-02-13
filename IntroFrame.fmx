@@ -1,0 +1,37 @@
+object IntroFrm: TIntroFrm
+  Align = Client
+  Size.Width = 320.000000000000000000
+  Size.Height = 480.000000000000000000
+  Size.PlatformDefault = False
+  object Panel1: TPanel
+    Align = VertCenter
+    Margins.Left = 5.000000000000000000
+    Margins.Right = 5.000000000000000000
+    Position.X = 5.000000000000000000
+    Position.Y = 215.000000000000000000
+    Size.Width = 310.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    object Label1: TLabel
+      Align = Top
+      AutoSize = True
+      Size.Width = 310.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.HorzAlign = Center
+      TextSettings.WordWrap = False
+      Text = 'Welcome!'
+    end
+    object GetStartedButton: TButton
+      Align = Bottom
+      Position.Y = 28.000000000000000000
+      Size.Width = 310.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = 'Get Started'
+      TextSettings.WordWrap = True
+    end
+  end
+end
