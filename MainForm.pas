@@ -48,7 +48,6 @@ type
     procedure FormActivate(Sender: TObject);
     procedure FormDeactivate(Sender: TObject);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
-    procedure TabControlChange(Sender: TObject);
     procedure IntroFrmGetStartedButtonClick(Sender: TObject);
     procedure PageAddressFrmDownloadButtonClick(Sender: TObject);
   private
@@ -75,7 +74,7 @@ var
 implementation
 
 uses
-  System.TypInfo, IdStack, {$IFDEF MSWINDOWS} Windows, {$ENDIF} // test: Trace, OutputDebugString
+  System.TypInfo, IdStack,
   DW.Connectivity, {$IFDEF ANDROID} UI.Toast.Android, {$ENDIF} // from: https://github.com/yangyxd/FMXUI
   System.Net.HttpClientComponent, System.Net.HttpClient,
   StrUtils, IdHTTP;
@@ -87,9 +86,10 @@ var // TEST
   TESTStoppable: Boolean = FALSE;
   TESTSimulate: Boolean = FALSE;
   TESTFragments: Integer = 10; // =1: no fragments, no delay
-  TESTTrace: String = ''; // empty: disable trace
+  TESTTrace: Boolean = TRUE;
+  TESTExcept: Boolean = {$IFDEF ANDROID} TRUE; {$ELSE} FALSE; {$ENDIF} //todo-op: Android app crash - can't fix it!?
 var // SWITCH
-  MODECheckConnected: Boolean = FALSE; //todo: not working, fix it
+  MODECheckConnected: Boolean = FALSE; //todo-op: Is connected - need fix
   MODENetHTTP: Boolean = FALSE;
 const
   TimeoutConnect = 5000;
@@ -106,6 +106,24 @@ begin
   {$ELSE}
     ShowMessage(Msg);
   {$ENDIF}
+end;
+//------------------------------------------------------------------------------
+procedure System_RaiseExceptObjProc(P: PExceptionRecord);
+begin
+{$IFDEF ANDROID}
+  if P <> nil then
+    Log.d('We are crashing in 3...'+sLineBreak+'Raise Except: '+sLineBreak+'%s: '+sLineBreak+'%s', [P.ExceptObject.ClassName, Exception(P.ExceptObject).Message])
+  else
+{$ENDIF}
+    Log.d('We are crashing in 3...'+sLineBreak+'Raise Except');
+  Sleep(15000);
+end;
+
+procedure System_ExceptionAcquiredProc(Obj: Pointer);
+begin
+  if Obj = nil then Log.d('We are crashing in 1...'+sLineBreak+'Except Acquired [%d]', [ExitCode])
+  else Log.d('We are crashing in 2...'+sLineBreak+'Except Acquired [%d]: '+sLineBreak+'%s: '+sLineBreak+'%s', [ExitCode, TObject(Obj).ClassName, Exception(Obj).Message]);
+  Sleep(15000);
 end;
 //------------------------------------------------------------------------------
 
@@ -127,10 +145,8 @@ function TTaskStoppable.CheckStopped(RaiseError: Boolean = FALSE; RemoveEvents: 
 begin
   Result := Stopped;
   if not Stopped then Exit;
-  if RemoveEvents then
-    if TThread.Current.ThreadID <> MainThreadID then // just in case
-      TThread.RemoveQueuedEvents(TThread.Current);
-  if RaiseError then Abort; //todo: Android crash on handled/hidden exception (Android 8) - Delphi, SDK, Android version?
+  if RemoveEvents then TThread.RemoveQueuedEvents(TThread.Current);
+  if RaiseError then Abort; //todo-op: Android app crash on handled/hidden exception (Android 8) - Delphi, SDK, Android version?
 end;
 
 function TTaskStoppable.IsComplete: Boolean;
@@ -147,15 +163,14 @@ begin
     //if (Self as ITask).Status <> TTaskStatus.Running then Exit;
     if IsComplete then Exit;
 
-    {$IFDEF MSWINDOWS} if TESTStoppable then OutputDebugString('WAIT'); {$ENDIF}
-    //?CheckSynchronize; // do we need it?
+    if TESTStoppable then Log.d('WAIT');
+    CheckSynchronize; // do we need it with TThread.Queue?
     try
       Result := Wait(Timeout);
     except
     end;
-    //?CheckSynchronize; // do we need it?
   finally
-    {$IFDEF MSWINDOWS} if TESTStoppable then OutputDebugString('DONE'); {$ENDIF}
+    if TESTStoppable then Log.d('DONE');
   end;
 end;
 
@@ -169,26 +184,39 @@ end;
 { TMainFrm }
 
 procedure TMainFrm.FormCreate(Sender: TObject);
-//var L, D, F: TColor;
+
+  procedure SetBrush(AlphaColor: TAlphaColor; Brush: array of TBrush);
+  var b: TBrush;
+  begin
+    for b in Brush do b.Color := AlphaColor;
+  end;
+
+  procedure SetText(AlphaColor: TAlphaColor; TextSettings: array of TTextSettings);
+  var t: TTextSettings;
+  begin
+    for t in TextSettings do t.FontColor := AlphaColor;
+  end;
+
+var LC, DC, DT, LT: TAlphaColor;
 begin
-  // Scale x2
+  if TESTExcept then begin //todo-op: Android app crash - dirty trick to show exception message before crash
+    RaiseExceptObjProc := @System_RaiseExceptObjProc;
+    ExceptionAcquired := @System_ExceptionAcquiredProc;
+  end;
+
+  // Theme - Background and Text color
+  LC := TAlphaColorRec.Lightcyan; DC := TAlphaColorRec.Darkcyan; DT := TAlphaColorRec.Black; LT := TAlphaColorRec.White; // default
+  if TESTTrace then begin
+    DC := TAlphaColorRec.Lightcyan; LC := TAlphaColorRec.Darkcyan; LT := TAlphaColorRec.Black; DT := TAlphaColorRec.White; // invert
+  end;
+  SetBrush(LC, [IntroFrm.Background.Fill, PageAddressFrm.Background.Fill, PageSourceFrm.Background.Fill, PageSourceFrm.ProgressCircle.Fill]);
+  SetText(DT, [IntroFrm.WelcomeLabel.TextSettings, PageAddressFrm.WebAddressLabel.TextSettings, PageSourceFrm.WebAddressLabel.TextSettings]);
+  SetBrush(DC, [IntroFrm.GetStartedRectangle.Fill, PageAddressFrm.DownloadRectangle.Fill, PageSourceFrm.ProgressCircle.Stroke, PageSourceFrm.ProgressEllipse.Stroke]);
+  SetText(LT, [IntroFrm.GetStartedButton.TextSettings, PageAddressFrm.DownloadButton.TextSettings]);
+
+  // Scale x2 (fix?)
   IntroFrm.GetStartedRectangle.Height := IntroFrm.GetStartedRectangle.Height * 2; //?
   PageAddressFrm.DownloadRectangle.Height := PageAddressFrm.DownloadRectangle.Height * 2; //?
-
-  //todo: Colors
-  //L := TColors.Lightcyan; D := TColors.Darkcyan; F := TColors.White; // default
-//  L := TColors.Darkcyan; D := TColors.Lightcyan; F := TColors.Black;
-//  if TESTTrace <> '' then begin L := TColors.Lightcoral; D := TColors.Coral; F := TColors.White; end;
-//  IntroFrm.Background.Fill.Color := L;
-//  IntroFrm.GetStartedRectangle.Fill.Color := D;
-//  IntroFrm.GetStartedButton.TextSettings.FontColor := F;
-//  PageAddressFrm.Background.Fill.Color := L;
-//  PageAddressFrm.DownloadRectangle.Fill.Color := D;
-//  PageAddressFrm.DownloadButton.TextSettings.FontColor := F;
-//  PageSourceFrm.Background.Fill.Color := L;
-//  PageSourceFrm.ProgressCircle.Fill.Color := L;
-//  PageSourceFrm.ProgressCircle.Stroke.Color := D;
-//  PageSourceFrm.ProgressEllipse.Stroke.Color := D;
 
   TabControl.TabPosition := TTabPosition.None;
   TabControl.ActiveTab := IntroTabItem;
@@ -224,8 +252,9 @@ procedure TMainFrm.FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; 
 begin
   {$IFDEF MSWINDOWS} if (Key = vkBack) and (ActiveControl = PageAddressFrm.WebAddressEdit) then Exit; {$ENDIF}
   if Key in [vkHardwareBack {$IFDEF MSWINDOWS} , vkBack {$ENDIF} ] then
-    if TabControl.ActiveTab = PageAddressTabItem then begin
+  { if TabControl.ActiveTab = PageAddressTabItem then begin
       if ActiveControl = PageAddressFrm.WebAddressEdit then
+        //todo-op: default when TVirtualKeyboardStates.Visible
         // default
       else if BackPressed then
         // default (Close)
@@ -235,7 +264,8 @@ begin
         BackPressed := TRUE;
         Exit; // BackPressed
       end;
-    end else if TabControl.ActiveTab <> PageSourceTabItem then
+    end else }
+    if TabControl.ActiveTab <> PageSourceTabItem then
       // default (Close)
     else if IsDownloading then begin
       Key := 0;
@@ -244,7 +274,7 @@ begin
       else if BackPressed then begin
         DownloadStop.StopAndWait;
         TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide);
-        Exit; // BackPressed
+        PageAddressFrm.WebAddressEdit.SetFocus;
       end else begin
         ShowToast('Press "Back" again to Stop...');
         BackPressed := TRUE;
@@ -254,34 +284,29 @@ begin
       Key := 0;
       // or: TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide)
       TabControl.ActiveTab := PageAddressTabItem;
+      PageAddressFrm.WebAddressEdit.SetFocus;
     end;
   BackPressed := FALSE;
   {$IFDEF MSWINDOWS} if Key = vkBack then Close; {$ENDIF}
 end;
 
-procedure TMainFrm.TabControlChange(Sender: TObject);
-begin
-  //todo: ActiveControl not changed when page is shown for first time
-  if TabControl.ActiveTab = PageAddressTabItem then ActiveControl := PageAddressFrm.WebAddressEdit
-  else if TabControl.ActiveTab = PageSourceTabItem then ActiveControl := PageSourceFrm.ResponseMemo;
-  BackPressed := FALSE;
-end;
-
 procedure TMainFrm.IntroFrmGetStartedButtonClick(Sender: TObject);
 begin
-  //todo: Android crash on handled/hidden exception (Android 8) - Delphi, SDK, Android version?
+  //todo-op: Android app crash on handled/hidden exception (Android 8) - Delphi, SDK, Android version?
   // https://stackoverflow.com/questions/38243473/exception-handling-broken-in-delphi-xe8-android
-  //try
-  //  Abort;
-  //except
-    TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide);
-  //end;
+  //if TESTExcept then try Abort; except end; // example handled/hidden exception
+
+  TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide);
+  PageAddressFrm.WebAddressEdit.SetFocus;
+  BackPressed := FALSE;
 end;
 
 procedure TMainFrm.PageAddressFrmDownloadButtonClick(Sender: TObject);
 begin
   PageSourceFrm.WebAddressLabel.Text := PageAddressFrm.WebAddressEdit.Text;
   TabControl.SetActiveTabWithTransition(PageSourceTabItem, TTabTransition.Slide);
+  PageSourceFrm.ResponseMemo.SetFocus;
+  BackPressed := FALSE;
   if Assigned(DownloadStop) then DownloadStop.StopAndWait;
   DownloadURL := PageAddressFrm.WebAddressEdit.Text;
 
@@ -303,14 +328,14 @@ procedure TMainFrm.Download(Sender: TObject);
 var Data: String;
 begin
   //try
-    {$IFDEF MSWINDOWS} if TESTStoppable then OutputDebugString('task'); {$ENDIF}
+    if TESTStoppable then Log.d('task');
     Download_Progress;
     try
       Download_Get(Data);
       Download_Show(Data);
     finally
       Download_Done;
-      {$IFDEF MSWINDOWS} if TESTStoppable then OutputDebugString('done'); {$ENDIF}
+      if TESTStoppable then Log.d('done');
     end;
   //except end; // handle exception: TTaskStatus.Completed vs TTaskStatus.Exception
 end;
@@ -340,25 +365,21 @@ procedure TMainFrm.Download_Status(ASender: TObject; const AStatus: TIdStatus; c
     else Result := Pref + ': ' + Obj.ClassName + sLineBreak;
   end;
 
-var Msg: String;
 begin
-  if TESTTrace <> '' then begin
-    Msg := 'Status: ' + GetEnumName(TypeInfo(TIdStatus), Ord(AStatus)) + ' - ' + AStatusText + sLineBreak;
-    Msg := Msg + Details('ASender', ASender);
-    if ASender is TidHTTP then Msg := Msg + Details('IOHandler', TidHTTP(ASender).IOHandler);
-    Msg := Msg + Details('GStack', GStack);
-    TestTRACE := TestTRACE + '---' + sLineBreak + Msg;
+  if TESTTrace then begin
+    Log.d('Status: ' + GetEnumName(TypeInfo(TIdStatus), Ord(AStatus)) + ' - ' + AStatusText);
+    Log.d(Details('ASender', ASender));
+    if ASender is TidHTTP then Log.d(Details('IOHandler', TidHTTP(ASender).IOHandler));
+    Log.d(Details('GStack', GStack)); // TIdStack.ResolveHost or Android getaddrinfo
   end;
 
-  Msg := '';
-  {$IFDEF ANDROID} if TESTTrace = '' then Msg := AStatusText; {$ENDIF}
-  if Msg = '' then Exit;
-
+{$IFDEF ANDROID}
   if DownloadStop.CheckStopped then Exit; // DownloadTask.CheckCanceled;
   TThread.Queue(nil, procedure
     begin
-      ShowToast(Msg);
+      ShowToast(AStatusText);
     end);
+{$ENDIF}
 end;
 
 procedure TMainFrm.Download_Get(var Data: String);
@@ -369,26 +390,30 @@ var
   Client: TNetHTTPClient;
   Request: TNetHTTPRequest;
   Response: IHTTPResponse;
+  Net, Wifi: Boolean;
 begin
   delay := 0;
 
   if DownloadStop.CheckStopped then Exit; // DownloadTask.CheckCanceled;
-  if not TESTSimulate then TThread.Queue(nil, procedure
-    begin
-      if not MODECheckConnected then
-        //ShowToast('Before GET')
-      else if not TConnectivity.IsConnectedToInternet then begin
-        ShowToast('Not Connected');
-        Exit;
-      end else if not TConnectivity.IsWifiInternetConnection then begin
-        ShowToast('Not Wifi GET')
-      end else
-        ShowToast('Wifi GET');
-    end);
+  if not TESTSimulate then begin
+    Net := MODECheckConnected and TConnectivity.IsConnectedToInternet;
+    Wifi := Net and TConnectivity.IsWifiInternetConnection;
+    TThread.Queue(nil, procedure
+      begin
+        if not MODECheckConnected then
+          //ShowToast('Before GET')
+        else if not Net then begin
+          ShowToast('Not Connected');
+          Exit;
+        end else if not Wifi then begin
+          ShowToast('Not Wifi GET')
+        end else
+          ShowToast('Wifi GET');
+      end);
+  end;
 
-  //todo: fix TPlatformConnectivity (DW.Connectivity.Android), JNetwork (Androidapi.JNI.Net), TAndroidHelper
-  // or: run second Task - Sleep Timeout, Resolve 'google.com', Connect 1.1.1.1 and Show feedback 'Connection status'
-  // Resolve OK - Firewall; Connect OK - ISP/DNS; Both ERR - Not connected
+  //todo-op: Is connected - need fix: TPlatformConnectivity (DW.Connectivity.Android), JNetwork (Androidapi.JNI.Net), TAndroidHelper
+  // or: run second Task to Resolve 'google.com' and Connect 1.1.1.1: Resolve OK - Firewall; Connect OK - ISP/DNS; Both ERR - Not connected
 
   if TESTSimulate then begin
     Data := '';
@@ -445,22 +470,18 @@ end;
 procedure TMainFrm.Download_Show(Data: String);
 var parts: Integer;
 begin
-  if TESTTrace <> '' then Data := TESTTrace;
   if Data = '' then Exit;
 
   if DownloadStop.CheckStopped then Exit; // DownloadTask.CheckCanceled;
   TThread.Queue(nil, procedure
     begin
       PageSourceFrm.ResponseMemo.Lines.Clear;
-      if TESTFragments = 1 then PageSourceFrm.ResponseMemo.Lines.Text := Data;
+      if {$IFDEF ANDROID} TRUE or {$ENDIF} (TESTFragments = 1) then
+        PageSourceFrm.ResponseMemo.Lines.Text := Data;
     end);
-  //if DownloadStop.Queue(nil, procedure
-  //  begin
-  //    PageSourceFrm.ResponseMemo.Lines.Clear;
-  //    if TESTFragments = 1 then PageSourceFrm.ResponseMemo.Lines.Text := Data;
-  //  end) then Exit;
+  //if DownloadStop.Queue(nil, procedure begin ... end) then Exit;
 
-  if TESTFragments = 1 then Exit;
+  if {$IFDEF ANDROID} TRUE or {$ENDIF} (TESTFragments = 1) then Exit;
   for parts := 1 to TESTFragments do begin
     if DownloadStop.CheckStopped then Exit; // DownloadTask.CheckCanceled;
     Sleep(Trunc(TimeoutConnect / TESTFragments));
@@ -469,23 +490,13 @@ begin
     TThread.Queue(nil, procedure
       begin
         PageSourceFrm.ResponseMemo.Lines.Text := Copy(Data, 1, Trunc(Length(Data) * parts / TESTFragments));
-        //todo: test ScrollBy with Android
-        with PageSourceFrm.ResponseMemo do
-          if parts < TESTFragments - 1 then ScrollBy(0, MAXINT) else ScrollBy(0, -MAXINT); // scroll to top for last 2 fragments
+        with PageSourceFrm.ResponseMemo do //todo-op: ScrollBy not working with Android
+          if parts < TESTFragments - 1 then
+            ScrollBy(0, MAXINT) else ScrollBy(0, -MAXINT); // scroll to top for last 2 fragments
       end);
-    //if DownloadStop.Queue(nil, procedure
-    //  begin
-    //    PageSourceFrm.ResponseMemo.Lines.Text := Copy(Data, 1, Trunc(Length(Data) * parts / TESTFragments));
-    //    if parts < TESTFragments then with PageSourceFrm.ResponseMemo do ScrollBy(0, ViewportSize.Height);
-    //  end) then Exit;
+    //if DownloadStop.Queue(nil, procedure begin ... end) then Exit;
   end;
 end;
 
 end.
-
-//todo: CodeSite Logging
-//todo: TLayout
-//todo: colors, background
-//todo: scale and resize progress
-//todo: find size and controls
 

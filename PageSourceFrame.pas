@@ -11,15 +11,15 @@ uses
 
 type
   TPageSourceFrm = class(TFrame)
-    WebAddressLabel: TLabel;
-    ResponseMemo: TMemo;
-    ProgressCircle: TCircle;
-    ProgressXFloatAnimation: TFloatAnimation;
-    ProgressEllipse: TEllipse;
     Background: TRectangle;
     Layout: TLayout;
+    WebAddressLabel: TLabel;
+    ResponseMemo: TMemo;
     ProgressLayout: TLayout;
     ProgressBackground: TEllipse;
+    ProgressEllipse: TEllipse;
+    ProgressCircle: TCircle;
+    ProgressXFloatAnimation: TFloatAnimation;
     procedure ProgressXFloatAnimationFinish(Sender: TObject);
     procedure ProgressXFloatAnimationProcess(Sender: TObject);
     procedure LayoutResize(Sender: TObject);
@@ -46,14 +46,6 @@ procedure TPageSourceFrm.ProgressPause(Running: Boolean);
 begin
   ProgressXFloatAnimation.Pause := TRUE;
   ProgressLayout.Visible := Running;
-end;
-
-procedure TPageSourceFrm.LayoutResize(Sender: TObject);
-begin
-  with ProgressLayout do SetBounds(Position.X, Position.Y, Self.Width/3, Self.Height/12);
-  with ProgressBackground do SetBounds(-10, -5, ProgressLayout.Width+20, ProgressLayout.Height+10);
-  ProgressXFloatAnimation.StopValue := ProgressLayout.Width - ProgressCircle.Width;
-  a := 0;
 end;
 
 procedure TPageSourceFrm.ProgressContinue(Running: Boolean);
@@ -93,6 +85,14 @@ begin
     ProgressCircle.Position.Y := b + CircleBackDelta*2 - y
   else
     ProgressCircle.Position.Y := b + y;
+end;
+
+procedure TPageSourceFrm.LayoutResize(Sender: TObject);
+begin
+  with ProgressLayout do SetBounds(Position.X, Position.Y, Self.Width/3, Self.Height/12);
+  with ProgressBackground do SetBounds(-10, -5, ProgressLayout.Width+20, ProgressLayout.Height+10);
+  ProgressXFloatAnimation.StopValue := ProgressLayout.Width - ProgressCircle.Width;
+  a := 0;
 end;
 
 end.

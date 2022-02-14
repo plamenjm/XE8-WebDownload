@@ -23,7 +23,7 @@ object PageSourceFrm: TPageSourceFrm
       object WebAddressLabel: TLabel
         Align = Top
         AutoSize = True
-        StyledSettings = [Family, Size, FontColor]
+        StyledSettings = [Family, Size]
         Margins.Bottom = 10.000000000000000000
         Size.Width = 300.000000000000000000
         Size.Height = 16.000000000000000000

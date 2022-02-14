@@ -9,12 +9,12 @@ uses
 
 type
   TPageAddressFrm = class(TFrame)
+    Background: TRectangle;
+    Layout: TLayout;
     WebAddressLabel: TLabel;
     WebAddressEdit: TEdit;
-    DownloadButton: TSpeedButton;
-    Layout: TLayout;
     DownloadRectangle: TRectangle;
-    Background: TRectangle;
+    DownloadButton: TSpeedButton;
     procedure WebAddressEditKeyUp(Sender: TObject; var Key: Word; var KeyChar: Char; Shift: TShiftState);
   private
     { Private declarations }
