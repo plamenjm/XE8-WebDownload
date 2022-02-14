@@ -40,17 +40,15 @@ object MainFrm: TMainFrm
         Size.Width = 320.000000000000000000
         Size.Height = 431.000000000000000000
         Size.PlatformDefault = False
-        inherited Panel1: TPanel
-          Position.Y = 165.000000000000000000
-          Size.Height = 100.000000000000000000
-          inherited GetStartedButton: TButton
-            Margins.Left = 20.000000000000000000
-            Margins.Right = 20.000000000000000000
-            Position.X = 20.000000000000000000
-            Position.Y = 68.000000000000000000
-            Size.Width = 270.000000000000000000
-            Size.Height = 32.000000000000000000
-            OnClick = IntroFrmGetStartedButtonClick
+        inherited Background: TRectangle
+          Size.Height = 431.000000000000000000
+          inherited Layout: TLayout
+            Position.Y = 115.000000000000000000
+            inherited GetStartedRectangle: TRectangle
+              inherited GetStartedButton: TSpeedButton
+                OnClick = IntroFrmGetStartedButtonClick
+              end
+            end
           end
         end
       end
@@ -70,20 +68,15 @@ object MainFrm: TMainFrm
         Size.Width = 320.000000000000000000
         Size.Height = 431.000000000000000000
         Size.PlatformDefault = False
-        inherited Panel1: TPanel
-          Position.Y = 165.000000000000000000
-          Size.Height = 100.000000000000000000
-          inherited WebAddressEdit: TEdit
-            Size.Height = 32.000000000000000000
-          end
-          inherited DownloadButton: TButton
-            Margins.Left = 20.000000000000000000
-            Margins.Right = 20.000000000000000000
-            Position.X = 20.000000000000000000
-            Position.Y = 68.000000000000000000
-            Size.Width = 270.000000000000000000
-            Size.Height = 32.000000000000000000
-            OnClick = PageAddressFrmDownloadButtonClick
+        inherited Background: TRectangle
+          Size.Height = 431.000000000000000000
+          inherited Layout: TLayout
+            Position.Y = 115.000000000000000000
+            inherited DownloadRectangle: TRectangle
+              inherited DownloadButton: TSpeedButton
+                OnClick = PageAddressFrmDownloadButtonClick
+              end
+            end
           end
         end
       end
@@ -103,13 +96,25 @@ object MainFrm: TMainFrm
         Size.Width = 320.000000000000000000
         Size.Height = 431.000000000000000000
         Size.PlatformDefault = False
-        inherited Panel1: TPanel
-          Align = Contents
-          Size.Height = 421.000000000000000000
-          inherited ResponseMemo: TMemo
-            Size.Height = 405.000000000000000000
-            Viewport.Width = 306.000000000000000000
-            Viewport.Height = 401.000000000000000000
+        inherited Background: TRectangle
+          Size.Height = 431.000000000000000000
+          inherited Layout: TLayout
+            Size.Height = 411.000000000000000000
+            inherited ResponseMemo: TMemo
+              Size.Height = 385.000000000000000000
+              Viewport.Width = 296.000000000000000000
+              Viewport.Height = 381.000000000000000000
+            end
+            inherited ProgressLayout: TLayout
+              inherited ProgressCircle: TCircle [0]
+              end
+              inherited ProgressEllipse: TEllipse [1]
+              end
+              inherited ProgressBackground: TEllipse [2]
+                Fill.Kind = Resource
+                Stroke.Color = claWhite
+              end
+            end
           end
         end
       end

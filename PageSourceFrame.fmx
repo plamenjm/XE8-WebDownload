@@ -3,67 +3,93 @@ object PageSourceFrm: TPageSourceFrm
   Size.Width = 320.000000000000000000
   Size.Height = 480.000000000000000000
   Size.PlatformDefault = False
-  object Panel1: TPanel
-    Align = Client
-    Margins.Left = 5.000000000000000000
-    Margins.Top = 5.000000000000000000
-    Margins.Right = 5.000000000000000000
-    Margins.Bottom = 5.000000000000000000
-    Size.Width = 310.000000000000000000
-    Size.Height = 470.000000000000000000
+  object Background: TRectangle
+    Align = Contents
+    Fill.Color = claLightcyan
+    Size.Width = 320.000000000000000000
+    Size.Height = 480.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 0
-    object ResponseMemo: TMemo
-      Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-      DataDetectorTypes = []
-      ReadOnly = True
+    object Layout: TLayout
       Align = Client
-      Size.Width = 310.000000000000000000
-      Size.Height = 454.000000000000000000
+      Margins.Left = 10.000000000000000000
+      Margins.Top = 10.000000000000000000
+      Margins.Right = 10.000000000000000000
+      Margins.Bottom = 10.000000000000000000
+      Size.Width = 300.000000000000000000
+      Size.Height = 460.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 0
-      Viewport.Width = 306.000000000000000000
-      Viewport.Height = 450.000000000000000000
-    end
-    object WebAddressLabel: TLabel
-      Align = Top
-      AutoSize = True
-      Size.Width = 310.000000000000000000
-      Size.Height = 16.000000000000000000
-      Size.PlatformDefault = False
-      TextSettings.WordWrap = False
-      Text = 'Address: http://...'
-    end
-    object ProgressPanel: TPanel
-      Align = Center
-      Size.Width = 100.000000000000000000
-      Size.Height = 40.000000000000000000
-      Size.PlatformDefault = False
-      TabOrder = 2
-      object ProgressEllipse: TEllipse
-        Align = Client
-        Fill.Kind = None
-        Margins.Left = 10.000000000000000000
-        Margins.Top = 10.000000000000000000
-        Margins.Right = 10.000000000000000000
+      OnResize = LayoutResize
+      object WebAddressLabel: TLabel
+        Align = Top
+        AutoSize = True
+        StyledSettings = [Family, Size, FontColor]
         Margins.Bottom = 10.000000000000000000
-        Size.Width = 80.000000000000000000
-        Size.Height = 20.000000000000000000
-        Size.PlatformDefault = False
-      end
-      object ProgressCircle: TCircle
-        Fill.Color = claAqua
-        Position.Y = 12.000000000000000000
-        Size.Width = 16.000000000000000000
+        Size.Width = 300.000000000000000000
         Size.Height = 16.000000000000000000
         Size.PlatformDefault = False
-        object ProgressXFloatAnimation: TFloatAnimation
-          Duration = 2.000000000000000000
-          OnProcess = ProgressXFloatAnimationProcess
-          OnFinish = ProgressXFloatAnimationFinish
-          PropertyName = 'Position.X'
-          StartValue = 0.000000000000000000
-          StopValue = 85.000000000000000000
+        TextSettings.Font.Style = [fsBold]
+        Text = 'Address: http://...'
+      end
+      object ResponseMemo: TMemo
+        Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+        DataDetectorTypes = []
+        ReadOnly = True
+        Align = Client
+        Size.Width = 300.000000000000000000
+        Size.Height = 434.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Viewport.Width = 296.000000000000000000
+        Viewport.Height = 430.000000000000000000
+      end
+      object ProgressLayout: TLayout
+        Align = Center
+        Size.Width = 100.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object ProgressBackground: TEllipse
+          Align = Center
+          Fill.Color = claWhite
+          Opacity = 0.750000000000000000
+          Margins.Left = -10.000000000000000000
+          Margins.Top = -5.000000000000000000
+          Margins.Right = -10.000000000000000000
+          Margins.Bottom = -5.000000000000000000
+          Size.Width = 120.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Thickness = 0.000000000000000000
+        end
+        object ProgressCircle: TCircle
+          Fill.Color = claLightcyan
+          Position.Y = 12.000000000000000000
+          Size.Width = 16.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claDarkcyan
+          object ProgressXFloatAnimation: TFloatAnimation
+            Duration = 2.000000000000000000
+            OnProcess = ProgressXFloatAnimationProcess
+            OnFinish = ProgressXFloatAnimationFinish
+            PropertyName = 'Position.X'
+            StartValue = 0.000000000000000000
+            StopValue = 85.000000000000000000
+          end
+        end
+        object ProgressEllipse: TEllipse
+          Align = Client
+          Fill.Kind = None
+          Margins.Left = 10.000000000000000000
+          Margins.Top = 10.000000000000000000
+          Margins.Right = 10.000000000000000000
+          Margins.Bottom = 10.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 20.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Color = claDarkcyan
+          Stroke.Thickness = 2.000000000000000000
         end
       end
     end

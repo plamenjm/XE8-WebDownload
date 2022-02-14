@@ -110,10 +110,10 @@ class function TPlatformConnectivity.GetConnectedNetworkInfo: JNetworkInfo;
 var
   LManager: JConnectivityManager;
   // org: LAllNetworks: TJavaObjectArray<JNetwork>;
-  LAllNetworkInfo: TJavaObjectArray<JNetworkInfo>;
+  // org: LAllNetworkInfo: TJavaObjectArray<JNetworkInfo>;
   LInfo: JNetworkInfo;
   // org: LCapabilities: JNetworkCapabilities;
-  I: Integer;
+  // org: I: Integer;
 begin
   Result := nil;
   LManager := ConnectivityManager;
@@ -143,6 +143,8 @@ begin
   end
   else
 //}
+// org:
+{
   begin
     LAllNetworkInfo := LManager.getAllNetworkInfo;
     for I := 0 to LAllNetworkInfo.Length - 1 do
@@ -155,6 +157,11 @@ begin
       end;
     end;
   end;
+//}
+// new:
+  LInfo := LManager.getActiveNetworkInfo;
+  if (LInfo <> nil) and LInfo.isAvailable and LInfo.isConnected then
+    Result := LInfo;
 end;
 
 class function TPlatformConnectivity.IsConnectedToInternet: Boolean;

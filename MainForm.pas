@@ -6,7 +6,8 @@ uses
   System.Threading, IdComponent,
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  FMX.TabControl, IntroFrame, PageAddressFrame, PageSourceFrame;
+  FMX.TabControl, IntroFrame, PageAddressFrame, PageSourceFrame,
+  FMX.Controls.Presentation, FMX.StdCtrls, FMX.Objects, FMX.Layouts;
 
 type
   ITaskStoppable = interface
@@ -88,7 +89,7 @@ var // TEST
   TESTFragments: Integer = 10; // =1: no fragments, no delay
   TESTTrace: String = ''; // empty: disable trace
 var // SWITCH
-  MODECheckConnected: Boolean = FALSE;
+  MODECheckConnected: Boolean = FALSE; //todo: not working, fix it
   MODENetHTTP: Boolean = FALSE;
 const
   TimeoutConnect = 5000;
@@ -168,7 +169,27 @@ end;
 { TMainFrm }
 
 procedure TMainFrm.FormCreate(Sender: TObject);
+//var L, D, F: TColor;
 begin
+  // Scale x2
+  IntroFrm.GetStartedRectangle.Height := IntroFrm.GetStartedRectangle.Height * 2; //?
+  PageAddressFrm.DownloadRectangle.Height := PageAddressFrm.DownloadRectangle.Height * 2; //?
+
+  //todo: Colors
+  //L := TColors.Lightcyan; D := TColors.Darkcyan; F := TColors.White; // default
+//  L := TColors.Darkcyan; D := TColors.Lightcyan; F := TColors.Black;
+//  if TESTTrace <> '' then begin L := TColors.Lightcoral; D := TColors.Coral; F := TColors.White; end;
+//  IntroFrm.Background.Fill.Color := L;
+//  IntroFrm.GetStartedRectangle.Fill.Color := D;
+//  IntroFrm.GetStartedButton.TextSettings.FontColor := F;
+//  PageAddressFrm.Background.Fill.Color := L;
+//  PageAddressFrm.DownloadRectangle.Fill.Color := D;
+//  PageAddressFrm.DownloadButton.TextSettings.FontColor := F;
+//  PageSourceFrm.Background.Fill.Color := L;
+//  PageSourceFrm.ProgressCircle.Fill.Color := L;
+//  PageSourceFrm.ProgressCircle.Stroke.Color := D;
+//  PageSourceFrm.ProgressEllipse.Stroke.Color := D;
+
   TabControl.TabPosition := TTabPosition.None;
   TabControl.ActiveTab := IntroTabItem;
   PageAddressFrm.WebAddressEdit.Text := 'http://www.google.com';
@@ -223,7 +244,6 @@ begin
       else if BackPressed then begin
         DownloadStop.StopAndWait;
         TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide);
-        BackPressed := TRUE;
         Exit; // BackPressed
       end else begin
         ShowToast('Press "Back" again to Stop...');
@@ -241,6 +261,7 @@ end;
 
 procedure TMainFrm.TabControlChange(Sender: TObject);
 begin
+  //todo: ActiveControl not changed when page is shown for first time
   if TabControl.ActiveTab = PageAddressTabItem then ActiveControl := PageAddressFrm.WebAddressEdit
   else if TabControl.ActiveTab = PageSourceTabItem then ActiveControl := PageSourceFrm.ResponseMemo;
   BackPressed := FALSE;
@@ -359,9 +380,9 @@ begin
       else if not TConnectivity.IsConnectedToInternet then begin
         ShowToast('Not Connected');
         Exit;
-      end else if not TConnectivity.IsWifiInternetConnection then
+      end else if not TConnectivity.IsWifiInternetConnection then begin
         ShowToast('Not Wifi GET')
-      else
+      end else
         ShowToast('Wifi GET');
     end);
 
