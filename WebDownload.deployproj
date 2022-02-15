@@ -5,7 +5,7 @@
     </ProjectExtensions>
     <ItemGroup Condition="'$(Platform)'=='iOSDevice32'"/>
     <ItemGroup Condition="'$(Platform)'=='Android'">
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="Resources\CURV_960x720.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebDownload\res\drawable-xlarge\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
             <Operation>1</Operation>
@@ -21,7 +21,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="Resources\CURV_640x480.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebDownload\res\drawable-large\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
             <Operation>1</Operation>
@@ -86,7 +86,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="Resources\CURV_426x320.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebDownload\res\drawable-small\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
             <Operation>1</Operation>
@@ -142,7 +142,7 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Condition="'$(Config)'=='Debug'">
+        <DeployFile Include="Resources\CURV_470x320.png" Condition="'$(Config)'=='Debug'">
             <RemoteDir>WebDownload\res\drawable-normal\</RemoteDir>
             <RemoteName>splash_image.png</RemoteName>
             <Operation>1</Operation>

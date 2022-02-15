@@ -101,8 +101,8 @@ object MainFrm: TMainFrm
             Size.Height = 411.000000000000000000
             inherited ResponseMemo: TMemo
               Size.Height = 385.000000000000000000
-              Viewport.Width = 296.000000000000000000
-              Viewport.Height = 381.000000000000000000
+              Viewport.Width = 300.000000000000000000
+              Viewport.Height = 385.000000000000000000
             end
           end
         end

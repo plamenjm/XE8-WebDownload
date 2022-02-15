@@ -86,7 +86,7 @@ var // TEST
   TESTStoppable: Boolean = FALSE;
   TESTSimulate: Boolean = FALSE;
   TESTFragments: Integer = 10; // =1: no fragments, no delay
-  TESTTrace: Boolean = TRUE;
+  TESTTrace: Boolean = FALSE;
   TESTExcept: Boolean = {$IFDEF ANDROID} TRUE; {$ELSE} FALSE; {$ENDIF} //todo-op: Android app crash - can't fix it!?
 var // SWITCH
   MODECheckConnected: Boolean = FALSE; //todo-op: Is connected - need fix
