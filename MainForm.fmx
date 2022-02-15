@@ -1,7 +1,7 @@
 object MainFrm: TMainFrm
   Left = 0
   Top = 0
-  Caption = 'Web Page Source'
+  Caption = 'Web Download'
   ClientHeight = 480
   ClientWidth = 320
   FormFactor.Width = 320
