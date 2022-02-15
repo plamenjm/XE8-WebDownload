@@ -294,7 +294,7 @@ procedure TMainFrm.IntroFrmGetStartedButtonClick(Sender: TObject);
 begin
   //todo-op: Android app crash on handled/hidden exception (Android 8) - Delphi, SDK, Android version?
   // https://stackoverflow.com/questions/38243473/exception-handling-broken-in-delphi-xe8-android
-  //if TESTExcept then try Abort; except end; // example handled/hidden exception
+  //??? if TESTExcept then try Abort; except end; // example handled/hidden exception
 
   TabControl.SetActiveTabWithTransition(PageAddressTabItem, TTabTransition.Slide);
   PageAddressFrm.WebAddressEdit.SetFocus;
@@ -427,7 +427,7 @@ begin
       Request.MethodString := 'GET';
       Request.URL := DownloadURL;
       if DownloadStop.CheckStopped then Exit; // DownloadTask.CheckCanceled;
-      // todo: add status
+      // todo-op: add status
       // {$IFDEF ANDROID} ShowToast('Connecting...'); {$ENDIF}
       // Request.OnReceiveData: {$IFDEF ANDROID} ShowToast('Connected...'); {$ENDIF}
       // Request.OnReceiveData: {$IFDEF ANDROID} ShowToast('Receiving Data...'); {$ENDIF}
